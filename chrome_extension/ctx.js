@@ -7,8 +7,8 @@ chrome.runtime.onInstalled.addListener(function () {
         contexts: ['selection', 'link']
     });
 
-    function ctxResolve(data) {
-        chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+    function ctxResolve(data,pageurl) {
+        chrome.tabs.query({ url:pageurl }, function (tabs) {
             chrome.tabs.sendMessage(tabs[0].id, data);
         });
     }
@@ -22,7 +22,7 @@ chrome.runtime.onInstalled.addListener(function () {
                 fetched = await fetch(itemData.linkUrl);
             } else return;
             if (!fetched.ok) {
-                ctxResolve({ msg: "There is no wikipedia entry for this!" });
+                ctxResolve({ msg: "There is no wikipedia entry for this!" },itemData.pageUrl);
             } else {
                 let pseudo = await fetched.text();
                 let fill = document.createElement("div");
@@ -34,7 +34,7 @@ chrome.runtime.onInstalled.addListener(function () {
                         break;
                     }
                 }
-                ctxResolve({ success: mwpo.innerHTML, aurl: itemData.linkUrl });
+                ctxResolve({ success: mwpo.innerHTML, aurl: itemData.linkUrl },itemData.pageUrl);
             }
         }
     });
